@@ -104,9 +104,10 @@ class Game extends Component {
       [array[currentIndex], array[randomIndex]] = [
         array[randomIndex], array[currentIndex]];
     }
-    return array;
-    // Referência: https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+    return array; // Referência: https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
   };
+
+  orderRanking = (ranking) => ranking.sort((a, b) => b.score - a.score);
 
   // botão next
   handleClickNext = () => {
@@ -114,6 +115,20 @@ class Game extends Component {
     const { history } = this.props;
     const five = 4;
     if (question === five) {
+      const rankingStorage = localStorage.getItem('ranking'); // arthur: implementei a lógica de salvar o ranking do jogador no local storage
+      const { score, gravatarEmail, name } = this.props;
+      const newRanking = JSON.stringify([{ name, gravatarEmail, score }]);
+      if (!rankingStorage) {
+        localStorage.setItem('ranking', newRanking);
+      } else {
+        const previousRanking = JSON.parse(rankingStorage);
+        const updatedRanking = [...previousRanking, { name, gravatarEmail, score }];
+        console.log(this.orderRanking(updatedRanking));
+        localStorage.setItem(
+          'ranking',
+          JSON.stringify(this.orderRanking(updatedRanking)),
+        );
+      }
       history.push('/feedback');
     }
     this.setState((prevstate) => ({ question: prevstate.question + 1,
@@ -207,4 +222,8 @@ const mapDispatchToProps = (dispatch) => ({
   dispatchScore: (state) => dispatch(answerScore(state)),
 });
 
-export default connect(null, mapDispatchToProps)(Game);
+function mapStateToProps(state) {
+  return { ...state.player };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Game);
