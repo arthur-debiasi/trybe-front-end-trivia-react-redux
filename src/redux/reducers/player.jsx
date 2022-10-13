@@ -1,4 +1,4 @@
-import { ANSWER_SCORE, SUBMIT_USER_PROFILE } from '../actions';
+import { ANSWER_SCORE, RESTART_GAME, SUBMIT_USER_PROFILE } from '../actions';
 
 const INITIAL_STATE = {
   name: '',
@@ -15,6 +15,8 @@ function player(state = INITIAL_STATE, action) {
     return { ...state,
       score: state.score + action.payload,
       assertions: state.assertions + 1 };
+  case RESTART_GAME:
+    return INITIAL_STATE;
   default:
     return state;
   }
