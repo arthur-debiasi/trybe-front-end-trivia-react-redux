@@ -1,5 +1,5 @@
 import React from "react";
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Login from '../pages/Login';
 import App from '../App';
@@ -33,7 +33,7 @@ describe('Testa a página Login', () => {
     expect(textInput).toBeInTheDocument();
   });
 
-   test('Verifica o history.push', async () => {
+   test('Verifica o a troca de página para /game', async () => {
     const { history } = renderWithRouterAndRedux(<App />);
 
     const textInput = screen.getByTestId('input-player-name');
@@ -45,9 +45,8 @@ describe('Testa a página Login', () => {
     const buttonPlay = screen.getByTestId('btn-play');
     expect(buttonPlay).not.toBeDisabled()
     userEvent.click(buttonPlay);
-    const game = await screen.findByText(/game/i, {}, {timeout: 2000})
-    console.log(game);
-    expect(game).toBeInTheDocument();
-      expect(history.location.pathname).toBe('/game');
+    await waitFor(() => screen.getByRole('img', { name: /img gravatar/i }));
+    // const game = await screen.findByText(/game/i, {}, {timeout: 2000})
+    expect(history.location.pathname).toBe('/game');
   })
 })
