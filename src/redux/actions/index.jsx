@@ -7,3 +7,8 @@ export const RESTART_GAME = 'RESTART_GAME';
 export const answerScore = (payload) => ({ type: ANSWER_SCORE, payload });
 
 export const restartGame = () => ({ type: RESTART_GAME });
+
+export const submitProfile = (payload) => ({
+  type: SUBMIT_USER_PROFILE,
+  payload,
+});
