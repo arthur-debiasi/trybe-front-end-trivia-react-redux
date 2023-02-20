@@ -33,14 +33,14 @@ class LoginForm extends Component {
             type="button"
             data-testid="btn-play"
             disabled={ isDisabled }
-            onClick={ () => changeToPlay() }
+            onClick={ changeToPlay }
           >
             Play
           </button>
           <button
             type="button"
             data-testid="btn-settings"
-            onClick={ () => changeToSettings() }
+            onClick={ changeToSettings }
           >
             Configurações
           </button>

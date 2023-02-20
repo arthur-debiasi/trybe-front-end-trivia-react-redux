@@ -12,12 +12,12 @@ class Login extends Component {
     email: '',
     isDisabled: true,
     isSettings: false,
-    isGame: false,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const { dispatchRestartGame } = this.props;
     dispatchRestartGame(); // arthur: coloquei um dispatch de resetar o estado
+    await this.pegarToken();
   }
 
   pegarToken = async () => {
@@ -29,12 +29,11 @@ class Login extends Component {
     this.setState({ isSettings: true });
   };
 
-  changeToPlay = async () => {
+  changeToPlay = () => {
     const { email, name } = this.state;
-    const { dispatchSubmitProfile } = this.props;
-    await this.pegarToken();
-    this.setState({ isGame: true });
+    const { dispatchSubmitProfile, history } = this.props;
     dispatchSubmitProfile({ name, gravatarEmail: email });
+    history.push('/game');
   };
 
   validateLogin = () => {
@@ -47,13 +46,9 @@ class Login extends Component {
   };
 
   render() {
-    const { name, email, isDisabled, isGame, isSettings } = this.state;
+    const { name, email, isDisabled, isSettings } = this.state;
     if (isSettings) {
       return <Settings />;
-    }
-    if (isGame) {
-      const { history } = this.props;
-      history.push('/game');
     }
     return (
       <div>
@@ -61,8 +56,6 @@ class Login extends Component {
           name={ name }
           email={ email }
           isDisabled={ isDisabled }
-          isGame={ isGame }
-          isSettings={ isSettings }
           handleChange={ this.handleChange }
           changeToPlay={ this.changeToPlay }
           changeToSettings={ this.changeToSettings }
