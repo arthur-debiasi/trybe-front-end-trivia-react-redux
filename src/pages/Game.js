@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+// import { Link, Redirect } from 'react-router-dom';
 import Header from '../components/Header';
 import { answerScore } from '../redux/actions';
 
@@ -24,9 +25,8 @@ class Game extends Component {
   }
 
   requestGame = async () => {
-    const token = localStorage.getItem('token');
     const min = 3;
-    const result = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
+    const result = await fetch(`https://opentdb.com/api.php?amount=5&token=${localStorage.getItem('token')}`);
     const triviaData = await result.json();
     if (triviaData.response_code === min) {
       localStorage.setItem('token', '');
@@ -42,8 +42,7 @@ class Game extends Component {
         difficulty: data[question].difficulty,
       }, () => {
         const { answers, correctAnswer } = this.state;
-        const wrongs = answers
-          .filter((e) => !e.match(correctAnswer));
+        const wrongs = answers.filter((e) => !e.match(correctAnswer));
         this.setState({ wrongs });
       });
     });
@@ -54,7 +53,7 @@ class Game extends Component {
     clearInterval(this.timer);
   };
 
-  setScore = (target) => {
+  setScore = ({ name }) => {
     const { difficulty, time } = this.state;
     const { dispatchScore } = this.props;
     const TEN = 10;
@@ -71,7 +70,7 @@ class Game extends Component {
       diffValue = THREE;
       break;
     }
-    if (target.name === 'correct') {
+    if (name === 'correct') {
       const score = TEN + (time * diffValue);
       dispatchScore(score);
       this.setState({ timedOut: true });
@@ -117,29 +116,26 @@ class Game extends Component {
     if (question === five) {
       const rankingStorage = localStorage.getItem('ranking'); // arthur: implementei a lógica de salvar o ranking do jogador no local storage
       const { score, gravatarEmail, name } = this.props;
-      const newRanking = JSON.stringify([{ name, gravatarEmail, score }]);
       if (!rankingStorage) {
-        localStorage.setItem('ranking', newRanking);
+        localStorage.setItem('ranking', JSON.stringify([{ name, gravatarEmail, score }]));
       } else {
         const previousRanking = JSON.parse(rankingStorage);
         const updatedRanking = [...previousRanking, { name, gravatarEmail, score }];
-        console.log(this.orderRanking(updatedRanking));
         localStorage.setItem(
           'ranking',
           JSON.stringify(this.orderRanking(updatedRanking)),
         );
       }
+      this.setState({ redirectFeed: true });
+      this.setState(({ redirectFeed }) => ({ redirectFeed: !redirectFeed }));
       history.push('/feedback');
     }
-    this.setState((prevstate) => ({ question: prevstate.question + 1,
-
-    }), () => {
+    this.setState((prevstate) => ({ question: prevstate.question + 1 }), () => {
       const { data, answers, correctAnswer } = this.state;
       ({ question } = this.state);
-      const array = this.shuffle([
-        ...data[question].incorrect_answers, data[question].correct_answer]);
-      const wrongs = answers
-        .filter((e) => !e.match(correctAnswer));
+      const array = this
+        .shuffle([...data[question].incorrect_answers, data[question].correct_answer]);
+      const wrongs = answers.filter((e) => !e.match(correctAnswer));
       this.setState({
         correctAnswer: data[question].correct_answer,
         answers: array,
@@ -163,7 +159,9 @@ class Game extends Component {
       wrongs,
       time,
       btnNext,
-      timedOut } = this.state;
+      timedOut,
+    } = this.state;
+
     return (
       <div>
         <Header />
@@ -199,7 +197,6 @@ class Game extends Component {
                 <button
                   type="button"
                   data-testid="btn-next"
-                  // hidden={ btnNext }
                   onClick={ this.handleClickNext }
                 >
                   Next
@@ -212,18 +209,12 @@ class Game extends Component {
   }
 }
 
-Game.propTypes = {
-  history: PropTypes.shape({
-    push: PropTypes.func,
-  }),
-}.isRequired;
+Game.propTypes = { history: PropTypes.shape({ push: PropTypes.func }) }.isRequired;
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchScore: (state) => dispatch(answerScore(state)),
 });
 
-function mapStateToProps(state) {
-  return { ...state.player };
-}
+function mapStateToProps(state) { return { ...state.player }; }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);
