@@ -5,6 +5,7 @@ import App from '../App';
 import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
 import Ranking from '../pages/Ranking';
 import { RankingMock } from './helpers/localStorageMock';
+import { act } from 'react-dom/test-utils';
 
 const localStorageMock = (function () {
   let store = {};
@@ -39,7 +40,9 @@ Object.defineProperty(window, "localStorage", { value: localStorageMock });
 describe('Testa a página Login', () => {
   test('Verifica se existem título e botão', () => {
     localStorageMock.setItem('ranking', RankingMock);
-    renderWithRouterAndRedux(<Ranking />);
+    act(() => {
+      renderWithRouterAndRedux(<Ranking />);
+    })
     const title = screen.getByRole('heading', { name: /ranking/i });
     const homeBtn = screen.getByRole('button', { name: /home/i });
     expect(title).toBeInTheDocument();
