@@ -16,7 +16,7 @@ class Ranking extends Component {
         </Link>
         <div>
           {ranking.map(({ name, score }, i) => (
-            <li key={ name }>
+            <li key={ name + score }>
               <span data-testid={ `player-name-${i}` }>{name}</span>
               {' '}
               - Score:
