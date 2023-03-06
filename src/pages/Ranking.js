@@ -1,5 +1,11 @@
+import {
+  Button,
+  Card,
+  Typography,
+} from '@mui/material';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import RankingTable from '../components/RankingTable';
 
 class Ranking extends Component {
   state = {
@@ -9,23 +15,17 @@ class Ranking extends Component {
   render() {
     const { ranking } = this.state;
     return (
-      <div>
-        <h1 data-testid="ranking-title">Ranking</h1>
+      <Card>
+        <Typography variant="h2" data-testid="ranking-title">
+          Ranking
+        </Typography>
         <Link to="/">
-          <button type="button" data-testid="btn-go-home">Home</button>
+          <Button type="button" data-testid="btn-go-home">
+            <Typography variant="h5">Home</Typography>
+          </Button>
         </Link>
-        <div>
-          {ranking.map(({ name, score }, i) => (
-            <li key={ name + score }>
-              <span data-testid={ `player-name-${i}` }>{name}</span>
-              {' '}
-              - Score:
-              {' '}
-              <span data-testid={ `player-score-${i}` }>{score}</span>
-            </li>
-          ))}
-        </div>
-      </div>
+        <RankingTable ranking={ ranking } />
+      </Card>
     );
   }
 }

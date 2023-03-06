@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { Link, Redirect } from 'react-router-dom';
+import { Stack } from '@mui/material';
 import Header from '../components/Header';
 import { answerScore } from '../redux/actions';
+import Trivia from '../components/Trivia';
 
 class Game extends Component {
   state = {
@@ -26,7 +27,11 @@ class Game extends Component {
 
   requestGame = async () => {
     const min = 3;
-    const result = await fetch(`https://opentdb.com/api.php?amount=5&token=${localStorage.getItem('token')}`);
+    const result = await fetch(
+      `https://opentdb.com/api.php?amount=5&token=${localStorage.getItem(
+        'token',
+      )}`,
+    );
     const triviaData = await result.json();
     if (triviaData.response_code === min) {
       localStorage.setItem('token', '');
@@ -35,30 +40,37 @@ class Game extends Component {
     }
     this.setState({ data: triviaData.results }, () => {
       const { question, data } = this.state;
-      this.setState({
-        correctAnswer: data[question].correct_answer,
-        answers: this.shuffle([
-          ...data[question].incorrect_answers, data[question].correct_answer]),
-        difficulty: data[question].difficulty,
-      }, () => {
-        const { answers, correctAnswer } = this.state;
-        const wrongs = answers.filter((e) => !e.match(correctAnswer));
-        this.setState({ wrongs });
-      });
+      this.setState(
+        {
+          correctAnswer: data[question].correct_answer,
+          answers: this.shuffle([
+            ...data[question].incorrect_answers,
+            data[question].correct_answer,
+          ]),
+          difficulty: data[question].difficulty,
+        },
+        () => {
+          const { answers, correctAnswer } = this.state;
+          const wrongs = answers.filter((e) => !e.match(correctAnswer));
+          this.setState({ wrongs });
+        },
+      );
     });
   };
 
   mudarCor = ({ target }) => {
-    this.setState({ colors: true, btnNext: false }, this.setScore(target));
+    console.log('asdadadasdad1', target.innerText);
+    this.setState({ colors: true, btnNext: false }, this.setScore(target.innerHTML));
     clearInterval(this.timer);
   };
 
-  setScore = ({ name }) => {
-    const { difficulty, time } = this.state;
+  setScore = (name) => {
+    const { difficulty, time, correctAnswer } = this.state;
     const { dispatchScore } = this.props;
     const TEN = 10;
     const THREE = 3;
     let diffValue;
+    // console.log('------------------', target.name);
     switch (difficulty) {
     case 'easy':
       diffValue = 1;
@@ -70,8 +82,10 @@ class Game extends Component {
       diffValue = THREE;
       break;
     }
-    if (name === 'correct') {
-      const score = TEN + (time * diffValue);
+    console.log(name, this.stacorrectAnswer);
+    console.log(name === this.correctAnswer);
+    if (name === correctAnswer) {
+      const score = TEN + time * diffValue;
       dispatchScore(score);
       this.setState({ timedOut: true });
       clearInterval(this.timer);
@@ -84,24 +98,29 @@ class Game extends Component {
   gameTimer = () => {
     const SECOND = 1000;
     this.timer = setInterval(() => {
-      this.setState(({ time }) => ({ time: time - 1 }), () => {
-        const { time } = this.state;
-        if (time === 0) {
-          this.setState({ timedOut: true, btnNext: false, colors: true });
-          clearInterval(this.timer);
-        }
-      });
+      this.setState(
+        ({ time }) => ({ time: time - 1 }),
+        () => {
+          const { time } = this.state;
+          if (time === 0) {
+            this.setState({ timedOut: true, btnNext: false, colors: true });
+            clearInterval(this.timer);
+          }
+        },
+      );
     }, SECOND);
   };
 
   shuffle = (array) => {
-    let currentIndex = array.length; let
-      randomIndex;
+    let currentIndex = array.length;
+    let randomIndex;
     while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex -= 1;
       [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
+        array[randomIndex],
+        array[currentIndex],
+      ];
     }
     return array; // Referência: https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
   };
@@ -117,10 +136,16 @@ class Game extends Component {
       const rankingStorage = localStorage.getItem('ranking'); // arthur: implementei a lógica de salvar o ranking do jogador no local storage
       const { score, gravatarEmail, name } = this.props;
       if (!rankingStorage) {
-        localStorage.setItem('ranking', JSON.stringify([{ name, gravatarEmail, score }]));
+        localStorage.setItem(
+          'ranking',
+          JSON.stringify([{ name, gravatarEmail, score }]),
+        );
       } else {
         const previousRanking = JSON.parse(rankingStorage);
-        const updatedRanking = [...previousRanking, { name, gravatarEmail, score }];
+        const updatedRanking = [
+          ...previousRanking,
+          { name, gravatarEmail, score },
+        ];
         localStorage.setItem(
           'ranking',
           JSON.stringify(this.orderRanking(updatedRanking)),
@@ -130,22 +155,27 @@ class Game extends Component {
       this.setState(({ redirectFeed }) => ({ redirectFeed: !redirectFeed }));
       history.push('/feedback');
     }
-    this.setState((prevstate) => ({ question: prevstate.question + 1 }), () => {
-      const { data, answers, correctAnswer } = this.state;
-      ({ question } = this.state);
-      const array = this
-        .shuffle([...data[question].incorrect_answers, data[question].correct_answer]);
-      const wrongs = answers.filter((e) => !e.match(correctAnswer));
-      this.setState({
-        correctAnswer: data[question].correct_answer,
-        answers: array,
-        wrongs,
-        colors: false,
-        btnNext: true,
-        time: 30,
-        timedOut: false,
-      });
-    });
+    this.setState(
+      (prevstate) => ({ question: prevstate.question + 1 }),
+      () => {
+        const { data, answers, correctAnswer } = this.state;
+        ({ question } = this.state);
+        const array = this.shuffle([
+          ...data[question].incorrect_answers,
+          data[question].correct_answer,
+        ]);
+        const wrongs = answers.filter((e) => !e.match(correctAnswer));
+        this.setState({
+          correctAnswer: data[question].correct_answer,
+          answers: array,
+          wrongs,
+          colors: false,
+          btnNext: true,
+          time: 30,
+          timedOut: false,
+        });
+      },
+    );
     this.gameTimer();
   };
 
@@ -163,58 +193,45 @@ class Game extends Component {
     } = this.state;
 
     return (
-      <div>
+      <Stack
+        direction="column"
+        justifyContent="space-around"
+        alignItems="center"
+        maxWidth={ 1000 }
+        maxHeight={ 600 }
+        height="95vh"
+      >
         <Header />
-        {
-          data.length > 0 && (
-            <div>
-              <h2 data-testid="question-category">{data[question].category}</h2>
-              <h1 data-testid="question-text">{data[question].question}</h1>
-              <div data-testid="answer-options">
-                {
-                  answers.map((e) => (
-                    <button
-                      key={ e }
-                      data-testid={
-                        e.match(correctAnswer)
-                          ? 'correct-answer' : `wrong-answer-${wrongs.indexOf(e)}`
-                      }
-                      className={ colors
-                        ? (`${e.match(correctAnswer)
-                          ? 'correct' : 'wrong'}-answer`) : '' }
-                      type="button"
-                      disabled={ timedOut }
-                      onClick={ this.mudarCor }
-                      name={ e.match(correctAnswer) ? 'correct' : 'wrong' }
-                    >
-                      {e}
-                    </button>
-                  ))
-                }
-              </div>
-              <p>{time}</p>
-              { !btnNext && (
-                <button
-                  type="button"
-                  data-testid="btn-next"
-                  onClick={ this.handleClickNext }
-                >
-                  Next
-                </button>
-              )}
-            </div>)
-        }
-      </div>
+        {data.length > 0 && (
+          <Trivia
+            data={ data }
+            question={ question }
+            colors={ colors }
+            answers={ answers }
+            correctAnswer={ correctAnswer }
+            wrongs={ wrongs }
+            time={ time }
+            btnNext={ btnNext }
+            timedOut={ timedOut }
+            mudarCor={ this.mudarCor }
+            handleClickNext={ this.handleClickNext }
+          />
+        )}
+      </Stack>
     );
   }
 }
 
-Game.propTypes = { history: PropTypes.shape({ push: PropTypes.func }) }.isRequired;
+Game.propTypes = {
+  history: PropTypes.shape({ push: PropTypes.func }),
+}.isRequired;
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchScore: (state) => dispatch(answerScore(state)),
 });
 
-function mapStateToProps(state) { return { ...state.player }; }
+function mapStateToProps(state) {
+  return { ...state.player };
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

@@ -38,7 +38,10 @@ class Login extends Component {
 
   validateLogin = () => {
     const { name, email } = this.state;
-    this.setState({ isDisabled: !(name.length > 0 && email.length > 0) });
+    const regexp = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i; // https://pt.stackoverflow.com/questions/1386/express%C3%A3o-regular-para-valida%C3%A7%C3%A3o-de-e-mail
+    this.setState({
+      isDisabled: !(name.length > 2 && email.length > 0 && email.match(regexp)),
+    });
   };
 
   handleChange = ({ target: { name, value } }) => {
