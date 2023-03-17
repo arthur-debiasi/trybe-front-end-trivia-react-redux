@@ -27,6 +27,7 @@ Trivia game app developed with React and Redux, in which the user can:
 - Connect Redux to React components;
 - Create asynchronous actions in a React application that uses Redux;
 - Style React components with the Material UI library.
+- Write tests to ensure a good test coverage.
 
 ## Getting Started
 
