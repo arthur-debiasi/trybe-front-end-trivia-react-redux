@@ -19,6 +19,7 @@ Trivia game app developed with React and Redux, in which the user can:
 [![React][React.js]][React-url]
 [![Redux][Redux]][Redux-url]
 [![MUI][MUI]][MUI-url]
+[![React Testing Library][TestingLibrary]][TestingLibrary-url]
 
 
 ## 📌 Skills
@@ -65,3 +66,5 @@ Esse projeto está sob licença. Veja o arquivo [LICENÇA](LICENSE.md) para mais
 [Redux-url]: https://redux.js.org/
 [MUI]: https://img.shields.io/badge/material_ui-007FFF?style=for-the-badge&logo=mui&logoColor=white
 [MUI-url]: https://img.shields.io/badge/material_ui-007FFF?style=for-the-badge&logo=mui&logoColor=white
+[TestingLibrary]: https://img.shields.io/badge/React_Testing_Library-20232A?style=for-the-badge&logo=testinglibrary&logoColor=E33332
+[TestingLibrary-url]: https://testing-library.com/docs/react-testing-library/intro/
